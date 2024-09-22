@@ -10,16 +10,14 @@ task bcl2fastq {
 
     command <<<
         # create dir for FASTQs if nonexistent
-        mkdir -p ~{output_dir}/fastq_output
-
-        cd ~{runfolder_dir}
+        mkdir -p ~{output_dir}fastq_output
         
-        bcl2fastq --runfolder-dir . --output-dir /outputs/fastq_output --sample-sheet SampleSheet.csv  
+        bcl2fastq --runfolder-dir ~{runfolder_dir} --output-dir ~{output_dir}fastq_output --sample-sheet ~{runfolder_dir}SampleSheet.csv 
     >>>
 
     output {
-        # glob = collect files 
-        Array[File] fastq_files = glob("{output_dir}/fastq_output/*.fastq.gz")
+        # glob = collect files (THESE ARE GZIPPED)
+        Array[File] fastq_files = glob("~{output_dir}fastq_output/*.fastq.gz")
     }
 
     runtime {

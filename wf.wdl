@@ -13,16 +13,24 @@ workflow main {
     }
 
     call bcl2fastqTask.bcl2fastq {
-        input:
-            runfolder_dir = runfolder_dir, #pass workflow input to the task
+        input {
+            runfolder_dir = runfolder_dir, 
             output_dir = output_dir
+        }
+        output {
+            Array[File] fastq_files
+        }  
     }
+
 
     call fastqcTask.fastqc {
         input:
             fastq_files = bcl2fastqTask.bcl2fastq.fastq_files,
             output_dir = output_dir
     }
+        output: {
+            Array[File] fastq_files
+        }
 
     call alignmentTask.generate_sam {
         input:

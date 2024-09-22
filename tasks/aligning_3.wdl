@@ -13,7 +13,7 @@ task generate_sam {
 
         mkdir -p ~{output_dir}/aligned
 
-        # run bwa mem -- MAKE SURE GENOME IS INDEXED!
+        # run bwa mem -- MAKE SURE GENOME IS INDEXED BEFOREHAND!
         for R1 in ~{output_dir}/fastq_output/*_R1_001.fastq.gz; do
             R2=${R1/_R1_001.fastq.gz/_R2_001.fastq.gz}
             BASE=$(basename $R1 _R1_001.fastq.gz) 
