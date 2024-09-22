@@ -6,25 +6,22 @@ task fastqc {
 # note: didn't include fastqs as input - we navigate to the directory in docker run command
 
     input {
-        String output_dir # fastqc output directory
+        Array[File] fastq_files
+        String output_dir # fastq output directory
     }
 
     command <<<
         # create dir for FASTQC if nonexistent
         mkdir -p ~{output_dir}/fastqc_output
 
-        # pull fastqc docker image
-        docker pull staphb/fastqc:0.12.1
-
-        # run
-        docker run --rm \
-            -v ~{output_dir}/fastq_output:/fastq_files \
-            -v ~{output_dir}/fastqc_output:/fastqc_output \
-                staphb/fastqc:0.12.1 bash -c "
-                cd /fastq_files
-                fastqc -o /outputs/fastqc_output --noextract *.fastq.gz
-            "
+        cd /fastq_files
+        fastqc -o ~{output_dir}/fastqc_output --noextract ~{sep(",") fastq_files}
     >>>
 
-   # OUTPUT not needed as there's no more fastqc-related tasks.
+    # ommitted output - not needed
+
+    runtime{
+        docker: "staphb/fastqc:0.12.1"
+    }
+
 }
