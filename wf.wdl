@@ -2,7 +2,7 @@ version 1.0
 
 import "tasks/bcl2fastq_1.wdl" as bcl2fastqTask
 import "tasks/fastqc_2.wdl" as fastqcTask
-import "tasks/indexing_3.wdl" as indexingTask
+import "tasks/aligning_3.wdl" as alignmentTask
 
 workflow main {
     input {
@@ -24,16 +24,16 @@ workflow main {
             output_dir = output_dir
     }
 
-    call indexingTask.generate_sam {
+    call alignmentTask.generate_sam {
         input:
             resources_dir = resources_dir,
             output_dir = output_dir,
             ref_genome = ref_genome
     }
 
-    call indexingTask.generate_bam {
+    call alignmentTask.generate_bam {
         input:
-            sam_files = indexingTask.generate_sam.sam_files, 
+            sam_files = alignmentTask.generate_sam.sam_files, 
             output_dir = output_dir
     }
 }
