@@ -1,6 +1,6 @@
 {
   "main.resources_dir": "/home/SBGS1/resources/",
-  "main.runfolder_dir": "/home/SBGS1/resources/240719_M00132_0419_000000000-GM5FH_COPY/",
+  "main.runfolder_dir": "/home/SBGS1/testfolder/",
   "main.output_dir": "/home/SBGS1/resources/outputs/",
   "main.ref_genome": "/home/SBGS1/resources/GRCh38_masked_v2_decoy_excludes_GPRIN2_DUSP22_FANCD2/"
 }

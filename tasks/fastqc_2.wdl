@@ -8,15 +8,13 @@ task fastqc {
     }
 
     command <<<
-        # create dir for FASTQC if nonexistent
-        mkdir -p ~{output_dir}fastqc_output
+  
+        mkdir dir_fastqc
 
-        for FASTQ in ~{fastq_files}; do
-            fastqc -o ~{output_dir}fastqc_output --noextract $FASTQ
+        for i in  ~{sep=" " fastq_files}; do
+            fastqc -o dir_fastqc --noextract $i
         done
     >>>
-
-    # ommitted output - not needed
 
     runtime{
         docker: "staphb/fastqc:0.12.1"

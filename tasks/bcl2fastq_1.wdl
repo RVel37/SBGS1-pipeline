@@ -2,22 +2,29 @@ version 1.0
 
 task bcl2fastq {
 
-### INPUTS -- paths to relevant directories
     input {
-        String runfolder_dir 
-        String output_dir 
+        Array[File] bcl_files
+        String output_dir
     }
 
     command <<<
-        # create dir for FASTQs if nonexistent
-        mkdir -p ~{output_dir}fastq_output
+
+        mkdir dir_fastq; 
         
-        bcl2fastq --runfolder-dir ~{runfolder_dir} --output-dir ~{output_dir}fastq_output --sample-sheet ~{runfolder_dir}SampleSheet.csv 
-    >>>
+        # copy the "found" fastq files to new directory
+        for i in ~{sep=" " bcl_files}; do 
+            cp $i dir_fastq/
+        done
+        
+        >>>
+
+    ### ACTUAL BCL command ###
+    # bcl2fastq --runfolder-dir ~{runfolder_dir} --output-dir ~{output_dir}fastq_output --sample-sheet ~{runfolder_dir}SampleSheet.csv 
+    # >>>
 
     output {
-        # glob = collect files (THESE ARE GZIPPED)
-        Array[File] fastq_files = glob("~{output_dir}fastq_output/*.fastq.gz")
+        # collect the gzipped FASTQ files
+        Array[File] fastq_files = glob("dir_fastq/*.fastq.gz")
     }
 
     runtime {

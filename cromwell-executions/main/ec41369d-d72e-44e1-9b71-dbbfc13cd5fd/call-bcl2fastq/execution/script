@@ -1,0 +1,58 @@
+#!/bin/bash
+
+cd /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution
+tmpDir=$(mktemp -d "$PWD"/tmp.XXXXXX)
+chmod 777 "$tmpDir"
+export _JAVA_OPTIONS=-Djava.io.tmpdir="$tmpDir"
+export TMPDIR="$tmpDir"
+
+
+(
+cd /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution
+
+)
+
+
+outec41369d="${tmpDir}/out.$$" errec41369d="${tmpDir}/err.$$"
+mkfifo "$outec41369d" "$errec41369d"
+trap 'rm "$outec41369d" "$errec41369d"' EXIT
+touch '/cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/stdout' '/cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/stderr'
+tee '/cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/stdout' < "$outec41369d" &
+tee '/cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/stderr' < "$errec41369d" >&2 &
+(
+cd /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution
+
+
+mkdir dir_fastq; 
+
+# copy the "found" fastq files to new directory
+for i in /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/inputs/-1382795584/1.fastq.gz /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/inputs/-1382795584/2.fastq.gz /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/inputs/-1382795584/3.fastq.gz /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/inputs/-1382795584/4.fastq.gz /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/inputs/-1382795584/5.fastq.gz; do 
+    cp $i dir_fastq/
+done
+)  > "$outec41369d" 2> "$errec41369d"
+echo $? > /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/rc.tmp
+(
+# add a .file in every empty directory to facilitate directory delocalization on the cloud
+cd /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution
+find . -type d -exec sh -c '[ -z "$(ls -A '"'"'{}'"'"')" ] && touch '"'"'{}'"'"'/.file' \;
+)
+(
+cd /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution
+sync
+# make the directory which will keep the matching files
+mkdir /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/glob-205bc0191ebe01c3b59c09192e6673b1
+
+# create the glob control file that will allow for the globbing to succeed even if there is 0 match
+echo "This file is used by Cromwell to allow for globs that would not match any file.
+By its presence it works around the limitation of some backends that do not allow empty globs.
+Regardless of the outcome of the glob, this file will not be part of the final list of globbed files." > /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/glob-205bc0191ebe01c3b59c09192e6673b1/cromwell_glob_control_file
+
+# hardlink or symlink all the files into the glob directory
+( ln -L /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/dir_fastq/*.fastq.gz /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/glob-205bc0191ebe01c3b59c09192e6673b1 2> /dev/null ) || ( ln /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/dir_fastq/*.fastq.gz /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/glob-205bc0191ebe01c3b59c09192e6673b1 )
+
+# list all the files (except the control file) that match the glob into a file called glob-[md5 of glob].list
+ls -1 /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/glob-205bc0191ebe01c3b59c09192e6673b1 | grep -v cromwell_glob_control_file > /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/glob-205bc0191ebe01c3b59c09192e6673b1.list
+
+
+)
+mv /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/rc.tmp /cromwell-executions/main/ec41369d-d72e-44e1-9b71-dbbfc13cd5fd/call-bcl2fastq/execution/rc
