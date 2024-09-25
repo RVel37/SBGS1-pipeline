@@ -11,19 +11,15 @@ workflow main {
         String runfolder_dir
         String output_dir
         String ref_genome
+        File sampleSheet
     }
 
 ############ TASKS ######################
 
-    call findFilesTask.find_files {
-        input:
-        runfolder_dir = runfolder_dir
-    }
-
     call bcl2fastqTask.bcl2fastq {
         input:
-            bcl_files = find_files.found_files, 
-            output_dir = output_dir
+        runfolder_dir = runfolder_dir,
+        output_dir = output_dir
     }
 
     # scatter (f in bcl2fastq.fastq_files) {

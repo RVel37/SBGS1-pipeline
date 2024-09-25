@@ -1,6 +1,6 @@
 {
-  "main.resources_dir": "/home/SBGS1/resources/",
-  "main.runfolder_dir": "/home/SBGS1/testfolder/",
-  "main.output_dir": "/home/SBGS1/resources/outputs/",
-  "main.ref_genome": "/home/SBGS1/resources/GRCh38_masked_v2_decoy_excludes_GPRIN2_DUSP22_FANCD2/"
+  "main.runfolder_dir": "/mnt/data1/working_directory/ray/resources/runfolder",
+  "main.output_dir": "/mnt/data1/working_directory/ray/SBGS1/outputs",
+  "main.ref_genome": "/mnt/data1/working_directory/ray/resources/GRCh38",
+  "main.sampleSheet": "/mnt/data1/working_directory/ray/resources/runfolder/Data/Intensities/BaseCalls/SampleSheet.csv"
 }
