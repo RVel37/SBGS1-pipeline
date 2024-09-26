@@ -3,20 +3,21 @@ version 1.0
 task fastqc {
 
     input {
-        Array[File] fastq_files
-        String output_dir 
+        File fastq_file
     }
 
     command <<<
-  
-        mkdir dir_fastqc
 
-        for i in  ~{sep=" " fastq_files}; do
-            fastqc -o dir_fastqc --noextract $i
-        done
+        mkdir dir_fastqc
+        fastqc -o dir_fastqc --noextract ~{fastq_file}
+        
     >>>
 
-    runtime{
+    output {
+        Array[File] fastqc_output = glob("dir_fastqc/*.{zip,html}")
+    }
+
+    runtime {
         docker: "staphb/fastqc:0.12.1"
     }
 }

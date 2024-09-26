@@ -2,57 +2,66 @@ version 1.0
 
 task generate_sam {
 
-### INPUTS
     input {
-        String resources_dir
-        String output_dir
-        String ref_genome
+        Array[File] ref_indexed
+        Array[File] fastq_files
+        File ref_genome
     }
 
     command <<<
 
-        mkdir -p ~{output_dir}/aligned
+        mkdir aligned; mkdir GRCh38
 
-        # run bwa mem (MAKE SURE GENOME IS INDEXED BEFOREHAND!)
-        for R1 in ~{output_dir}/fastq_output/*_R1_001.fastq.gz; do
+        # move to same dir
+        mv ~{sep=' ' ref_indexed} GRCh38
+        mv ~{ref_genome} GRCh38
+
+        # run bwa mem (requires indexed genome)
+        ## note: only works for this fastq naming convention
+
+        for R1 in ~{sep=" " fastq_files}; do
+
             R2=${R1/_R1_001.fastq.gz/_R2_001.fastq.gz}
             BASE=$(basename $R1 _R1_001.fastq.gz) 
-            OUTPUT_SAM=~{output_dir}/aligned/${BASE}.sam 
-            echo "Aligning $BASE..." 
-            bwa mem ~{ref_genome} $R1 $R2 > $OUTPUT_SAM 
+            OUTPUT_SAM=aligned/${BASE}.sam
+
+            bwa mem GRCh38/~{ref_genome} $R1 $R2 > $OUTPUT_SAM 
+
         done
     >>>
     
     output {
-        Array[File] sam_files = glob("~{output_dir}/aligned/*.sam")
+        Array[File] sam_files = glob("aligned/*.sam")
     }
 
     runtime {
-        docker: "quay.io/biocontainers/bwa:v0.7.17_cv1"
+        docker: "biocontainers/bwa:v0.7.17_cv1"
     }
 }
 
+
 task generate_bam {
+
     input {
-        Array [File] sam_files
-        String output_dir
+        File sam_file
     }
 
     command <<<
-        for SAM in ~{sam_files}; do 
-            BASE=$(basename $SAM .sam) 
-            OUTPUT_BAM=~{output_dir}/${BASE}_sorted.bam 
-            echo "Processing $BASE..." 
-            samtools view -bS $SAM | samtools sort -o $OUTPUT_BAM
-            samtools index $OUTPUT_BAM 
-        done
+
+        mkdir bam_aligned
+
+        BASE=$(basename ~{sam_file} .sam)
+        OUTPUT_BAM=bam_aligned/${BASE}_sorted.bam
+        samtools view -bS ~{sam_file} | samtools sort -o $OUTPUT_BAM
+        samtools index $OUTPUT_BAM   
+
     >>>
 
     output {
-        Array[File] bam_files = glob("~{output_dir}/aligned/*_sorted.bam")
+        Array[File] bam_files = glob("bam_aligned/*_sorted.bam")
     }
 
     runtime {
-        docker: "quay.io/biocontainers/samtools:1.10"
+        docker: "biocontainers/samtools:v1.9-4-deb_cv1"
     }
 }

@@ -16,7 +16,7 @@ task find_files {
         exit 1
     fi 
 
-    # for this task, run docker INSIDE the command, NOT in runtime (otherwise can't access runfolder - there is no 'directories' input option in WDL 1.0)
+    # for this task, docker is run within the command, NOT in runtime (otherwise can't access runfolder - there is no 'directories' input option in WDL 1.0)
 
     docker pull swglh/bcl2fastq2:2.20
     docker run --rm -v ~{resources_dir}:/resources/ -v ~{output_dir/fastq_output}:/outputs swglh/bcl2fastq2:2.20 bash -c "
@@ -29,5 +29,4 @@ task find_files {
     output {
         Array[File] fastq_files = glob("~{output_dir}/*fastq.gz")
     }
-
 }
