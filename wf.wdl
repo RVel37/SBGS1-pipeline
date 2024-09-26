@@ -2,7 +2,7 @@ version 1.0
 
 import "tasks/indexReference_0.wdl" as indexTask
 import "tasks/bcl2fastq_1.wdl" as bcl2fastqTask
-import "tasks/fastqc_2.wdl" as fastqcTask
+#import "tasks/fastqc_2.wdl" as fastqcTask
 import "tasks/aligning_3.wdl" as alignmentTask
 
 workflow main {
@@ -22,12 +22,12 @@ workflow main {
         output_dir = output_dir
     }
 
-    scatter (f in bcl2fastq.fastq_files) {
-        call fastqcTask.fastqc {
-            input:
-                fastq_file = f
-        }
-    }
+    # scatter (f in bcl2fastq.fastq_files) {
+    #     call fastqcTask.fastqc {
+    #         input:
+    #             fastq_file = f
+    #     }
+    # }
 
     # Check whether genome has been indexed; index if not
     call indexTask.check_index {
@@ -67,7 +67,7 @@ workflow main {
 
      output {
         Array[File] fastq_files = bcl2fastq.fastq_files
-        Array[File] fastqc_output = flatten(fastqc.fastqc_output) # flatten nested array
+       # Array[File] fastqc_output = flatten(fastqc.fastqc_output) # flatten nested array
         Array[File] sam_files = generate_sam.sam_files
         #Array[File] bam_files
      }

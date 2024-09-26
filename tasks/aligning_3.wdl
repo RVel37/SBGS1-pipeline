@@ -4,10 +4,15 @@ task concat_refs {
     input {
         String ref_genome
     }
-    command <<< #null 
+    command <<< 
+
+    mkdir refs 
+    cp ~{ref_genome}/* refs
+
     >>>
+
     output {
-        Array[File] ref_indexed = glob("~{ref_genome}/*.fa.*")
+        Array[File] ref_indexed = glob("~{ref_genome}/*")
     }
 
 }
@@ -27,7 +32,6 @@ task generate_sam {
 
         # move to same dir
         mv ~{sep=' ' ref_indexed} GRCh38
-        mv ~{ref_genome_fa} GRCh38
 
         # run bwa mem (requires indexed genome)
         ## note: only works for this fastq naming convention
@@ -38,7 +42,7 @@ task generate_sam {
             BASE=$(basename $R1 _R1_001.fastq.gz) 
             OUTPUT_SAM=aligned/${BASE}.sam
 
-            bwa mem GRCh38/~{ref_genome_fa} $R1 $R2 > $OUTPUT_SAM 
+            bwa-mem2 mem GRCh38/~{basename(ref_genome_fa)} $R1 $R2 > $OUTPUT_SAM 
 
         done
     >>>
@@ -48,7 +52,7 @@ task generate_sam {
     }
 
     runtime {
-        docker: "biocontainers/bwa:v0.7.17_cv1"
+        docker: "swglh/bwamem2:v2.2.1"
     }
 }
 
