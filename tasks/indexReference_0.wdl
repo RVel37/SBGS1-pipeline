@@ -1,5 +1,30 @@
 version 1.0
 
+task check_index {
+    input{
+        ref_genome
+    }
+
+    command <<<
+        
+        # if length of ref_genome directory is greater than 1
+        # (i.e. if ref_genome.fa has been indexed)
+        if [ "$(ls ~{ref_genome}/*.fa.* 2>/dev/null)" -gt 1 ]; then
+
+            echo "true" > is_indexed.txt
+        else 
+            echo "false" > is_indexed.txt 
+
+    >>>
+
+    output {
+        Bool is_indexed = read_string("is_indexed.txt") == "true"
+    }
+
+}
+
+
+
 task index_ref {
 
     input {
