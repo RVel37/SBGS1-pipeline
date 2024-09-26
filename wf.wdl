@@ -3,7 +3,7 @@ version 1.0
 import "tasks/indexReference_0.wdl" as indexTask
 import "tasks/bcl2fastq_1.wdl" as bcl2fastqTask
 import "tasks/fastqc_2.wdl" as fastqcTask
-#import "tasks/aligning_3.wdl" as alignmentTask
+import "tasks/aligning_3.wdl" as alignmentTask
 
 workflow main {
     # workflow input
@@ -42,16 +42,18 @@ workflow main {
         }
     }
 
-    # # glob all indexed ref genome files
-    # Array[File] ref_indexed = glob("~{ref_genome}/*.fa*")
+    # glob all indexed ref genome files
+    call alignmentTask.concat_refs {
+        input:
+        ref_genome = ref_genome
+    }
 
-    # call alignmentTask.generate_sam {
-    #     input:
-    #         resources_dir = resources_dir,
-    #         output_dir = output_dir,
-    #         ref_indexed = ref_indexed,
-    #         ref_genome = ref_genome_fa
-    # }
+    call alignmentTask.generate_sam {
+        input:
+            ref_indexed = concat_refs.ref_indexed,
+            fastq_files = fastq_files,
+            ref_genome_fa = ref_genome_fa
+    }
 
     # scatter (f in bcl2fastq.fastq_files) {
     #     call alignmentTask.generate_bam {
@@ -64,10 +66,10 @@ workflow main {
 ########### OUTPUTS #####################
 
      output {
-        # flatten nested array
-        Array[File] fastqc_output = flatten(fastqc.fastqc_output)
-    #     Array[File] sam_files,
-    #     Array[File] bam_files
+        Array[File] fastq_files = bcl2fastq.fastq_files
+        Array[File] fastqc_output = flatten(fastqc.fastqc_output) # flatten nested array
+        Array[File] sam_files = generate_sam.sam_files
+        #Array[File] bam_files
      }
 
 }

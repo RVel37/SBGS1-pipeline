@@ -1,11 +1,24 @@
 version 1.0
 
+task concat_refs {
+    input {
+        String ref_genome
+    }
+    command <<< #null 
+    >>>
+    output {
+        Array[File] ref_indexed = glob("~{ref_genome}/*.fa.*")
+    }
+
+}
+
+
 task generate_sam {
 
     input {
         Array[File] ref_indexed
         Array[File] fastq_files
-        File ref_genome
+        File ref_genome_fa
     }
 
     command <<<
@@ -14,7 +27,7 @@ task generate_sam {
 
         # move to same dir
         mv ~{sep=' ' ref_indexed} GRCh38
-        mv ~{ref_genome} GRCh38
+        mv ~{ref_genome_fa} GRCh38
 
         # run bwa mem (requires indexed genome)
         ## note: only works for this fastq naming convention
@@ -25,7 +38,7 @@ task generate_sam {
             BASE=$(basename $R1 _R1_001.fastq.gz) 
             OUTPUT_SAM=aligned/${BASE}.sam
 
-            bwa mem GRCh38/~{ref_genome} $R1 $R2 > $OUTPUT_SAM 
+            bwa mem GRCh38/~{ref_genome_fa} $R1 $R2 > $OUTPUT_SAM 
 
         done
     >>>
@@ -40,28 +53,28 @@ task generate_sam {
 }
 
 
-task generate_bam {
+# task generate_bam {
 
-    input {
-        File sam_file
-    }
+#     input {
+#         File sam_file
+#     }
 
-    command <<<
+#     command <<<
 
-        mkdir bam_aligned
+#         mkdir bam_aligned
 
-        BASE=$(basename ~{sam_file} .sam)
-        OUTPUT_BAM=bam_aligned/${BASE}_sorted.bam
-        samtools view -bS ~{sam_file} | samtools sort -o $OUTPUT_BAM
-        samtools index $OUTPUT_BAM   
+#         BASE=$(basename ~{sam_file} .sam)
+#         OUTPUT_BAM=bam_aligned/${BASE}_sorted.bam
+#         samtools view -bS ~{sam_file} | samtools sort -o $OUTPUT_BAM
+#         samtools index $OUTPUT_BAM   
 
-    >>>
+#     >>>
 
-    output {
-        Array[File] bam_files = glob("bam_aligned/*_sorted.bam")
-    }
+#     output {
+#         Array[File] bam_files = glob("bam_aligned/*_sorted.bam")
+#     }
 
-    runtime {
-        docker: "biocontainers/samtools:v1.9-4-deb_cv1"
-    }
-}
+#     runtime {
+#         docker: "swglh/samtools:1.18"
+#     }
+# }

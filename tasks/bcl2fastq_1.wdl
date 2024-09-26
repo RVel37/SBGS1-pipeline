@@ -24,9 +24,12 @@ task bcl2fastq {
         cd runfolder
         bcl2fastq --runfolder-dir . --output-dir /outputs --sample-sheet SampleSheet.csv
     "
+    
+    cp ~{output_dir}/fastq_output/*.fastq.gz dir_fastq
+
     >>>
 
     output {
-        Array[File] fastq_files = glob("~{output_dir}/*fastq.gz")
+        Array[File] fastq_files = glob("dir_fastq/*.fastq.gz")
     }
 }
