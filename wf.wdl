@@ -49,14 +49,15 @@ workflow main {
         ref_genome = ref_genome
     }
 
-    # can't scatter - need R1+R2 pairs
+    # convert to SAM
     call alignmentTask.generate_sam {
         input:
             ref_indexed = concat_refs.ref_indexed,
-            fastq_files = fastq_files,
+            fastq_files = bcl2fastq.fastq_files,
             ref_genome_fa = ref_genome_fa
     }
 
+    # convert to BAM -> run variant caller
     scatter (f in generate_sam.sam_files) {
         call alignmentTask.generate_bam {
             input:
@@ -65,10 +66,9 @@ workflow main {
         call variantCallingTask.octopus_caller {
             input:
                 ref_genome_fa = ref_genome_fa,
-                bam_file = alignmentTask.generate_bam.bam_file
+                bam_file = generate_bam.bam_file
         }
     }
-
 
 
 ########### OUTPUTS #####################
@@ -78,6 +78,7 @@ workflow main {
        # Array[File] fastqc_output = flatten(fastqc.fastqc_output) # flatten nested array
         Array[File] sam_files = generate_sam.sam_files
         Array[File] bam_files = generate_bam.bam_file
+        Array[File] vcf_files = octopus_caller.vcf_file
      }
 
 }

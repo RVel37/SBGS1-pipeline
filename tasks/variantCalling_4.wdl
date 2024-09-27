@@ -18,10 +18,10 @@ task octopus_caller {
     >>>
 
     output {
-        File vcf = "vc_output/output.vcf"
+        File vcf_file = "vc_output/output.vcf"
     }
 
     runtime {
-        docker: dancooke/octopus:invitae--eae1ab48_0
+        docker: "dancooke/octopus:latest"
     }
 }
