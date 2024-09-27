@@ -48,7 +48,7 @@ task generate_sam {
     >>>
     
     output {
-        Array[File] sam_files = glob("aligned/*.sam")
+        Array[File] sam_files = glob("aligned/*[!gz].sam")
     }
 
     runtime {
@@ -57,28 +57,28 @@ task generate_sam {
 }
 
 
-# task generate_bam {
+task generate_bam {
 
-#     input {
-#         File sam_file
-#     }
+    input {
+        File sam_file
+    }
 
-#     command <<<
+    command <<<
 
-#         mkdir bam_aligned
+        mkdir bam_aligned
 
-#         BASE=$(basename ~{sam_file} .sam)
-#         OUTPUT_BAM=bam_aligned/${BASE}_sorted.bam
-#         samtools view -bS ~{sam_file} | samtools sort -o $OUTPUT_BAM
-#         samtools index $OUTPUT_BAM   
+        BASE=$(basename ~{sam_file} .sam)
+        OUTPUT_BAM=bam_aligned/${BASE}_sorted.bam
+        samtools view -bS ~{sam_file} | samtools sort -o $OUTPUT_BAM
+        #samtools index $OUTPUT_BAM     #(provided indexing command here, not required for our variant caller)
 
-#     >>>
+    >>>
 
-#     output {
-#         Array[File] bam_files = glob("bam_aligned/*_sorted.bam")
-#     }
+    output {
+        File bam_file = "bam_aligned/*_sorted.bam"
+    }
 
-#     runtime {
-#         docker: "swglh/samtools:1.18"
-#     }
-# }
+    runtime {
+        docker: "swglh/samtools:1.18"
+    }
+}
