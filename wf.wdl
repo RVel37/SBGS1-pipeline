@@ -2,7 +2,7 @@ version 1.0
 
 import "tasks/indexReference_0.wdl" as indexTask
 import "tasks/bcl2fastq_1.wdl" as bcl2fastqTask
-#import "tasks/fastqc_2.wdl" as fastqcTask
+import "tasks/fastqc_2.wdl" as fastqcTask
 import "tasks/aligning_3.wdl" as alignmentTask
 import "tasks/variantCalling_4.wdl" as variantCallingTask
 
@@ -23,12 +23,12 @@ workflow main {
         output_dir = output_dir
     }
 
-    # scatter (f in bcl2fastq.fastq_files) {
-    #     call fastqcTask.fastqc {
-    #         input:
-    #             fastq_file = f
-    #     }
-    # }
+    scatter (f in bcl2fastq.fastq_files) {
+        call fastqcTask.fastqc {
+            input:
+                fastq_file = f
+        }
+    }
 
     # Check whether genome has been indexed; index if not
     call indexTask.check_index {
@@ -49,7 +49,7 @@ workflow main {
         ref_genome = ref_genome
     }
 
-    # convert to SAM
+    # convert to SAM 
     call alignmentTask.generate_sam {
         input:
             ref_indexed = concat_refs.ref_indexed,
@@ -58,6 +58,12 @@ workflow main {
     }
 
     # convert to BAM -> run variant caller
+
+    ### NOTE:
+    # Bam and sam files all get generated successfully; 
+    # need to figure out how to pass in the bam files as input for variantcalling.
+    # (cause they all get scattered. Error: "expected File instead of Array[File]")
+
     scatter (f in generate_sam.sam_files) {
         call alignmentTask.generate_bam {
             input:
@@ -75,7 +81,7 @@ workflow main {
 
      output {
         Array[File] fastq_files = bcl2fastq.fastq_files
-       # Array[File] fastqc_output = flatten(fastqc.fastqc_output) # flatten nested array
+        Array[File] fastqc_output = flatten(fastqc.fastqc_output) # flatten nested array
         Array[File] sam_files = generate_sam.sam_files
         Array[File] bam_files = generate_bam.bam_file
         Array[File] vcf_files = octopus_caller.vcf_file
