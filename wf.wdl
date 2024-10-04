@@ -1,10 +1,10 @@
 version 1.0
 
-import "tasks/indexReference_0.wdl" as indexTask
-import "tasks/bcl2fastq_1.wdl" as bcl2fastqTask
-import "tasks/fastqc_2.wdl" as fastqcTask
-import "tasks/aligning_3.wdl" as alignmentTask
-import "tasks/variantCalling_4.wdl" as variantCallingTask
+import "tasks/indexReference.wdl" as indexTask
+import "tasks/bcl2fastq.wdl" as bcl2fastqTask
+import "tasks/fastqc.wdl" as fastqcTask
+import "tasks/aligning.wdl" as alignmentTask
+import "tasks/variantCalling.wdl" as variantCallingTask
 
 workflow main {
     # workflow input

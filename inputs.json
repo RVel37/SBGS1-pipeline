@@ -1,6 +1,7 @@
 {
   "main.runfolder_dir": "/mnt/data1/working_directory/ray/resources/runfolder",
   "main.output_dir": "/mnt/data1/working_directory/ray/SBGS1/outputs",
+  
   "main.ref_genome": "/mnt/data1/working_directory/ray/resources/GRCh38",
   
   "main.ref_genome_fa": "/mnt/data1/working_directory/ray/resources/GRCh38/GRCh38_masked_v2_decoy_excludes_GPRIN2_DUSP22_FANCD2.fa"
