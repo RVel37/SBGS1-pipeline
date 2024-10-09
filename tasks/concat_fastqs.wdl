@@ -1,6 +1,6 @@
 version 1.0
 
-task concat_fastqs_task {
+task concat_fastqs {
     
     input {
         String fastq_dir
@@ -12,6 +12,6 @@ task concat_fastqs_task {
     >>>
 
     output {
-        Array[File] fastq_array = glob("~{fastq_dir}/*")
+        Array[File] fastq_files = glob("~{fastq_dir}/*")
     }
 }

@@ -1,15 +1,21 @@
 version 1.0
 
-import "tasks/indexReference.wdl" as indexTask
-import "tasks/bcl2fastq.wdl" as bcl2fastqTask
+# snake_case for filenames, camelCase for tasknames
+
+import "tasks/concat_fastqs.wdl" as concatFastqsTask
+import "tasks/fastqc.wdl" as fastqcTask
+import "tasks/multiqc.wdl" as multiqcTask
+import "tasks/index_reference.wdl" as indexTask
 import "tasks/fastqc.wdl" as fastqcTask
 import "tasks/aligning.wdl" as alignmentTask
-import "tasks/variantCalling.wdl" as variantCallingTask
+import "tasks/variant_calling.wdl" as variantCallingTask
 
 workflow main {
-    # workflow input
+
+############# INPUTS #####################
+
     input {
-        String runfolder_dir
+        String fastq_dir
         String output_dir
         String ref_genome
         File ref_genome_fa
@@ -17,20 +23,27 @@ workflow main {
 
 ############ TASKS ######################
 
-    call bcl2fastqTask.bcl2fastq {
+# pull fastqs from input dir -> array[file] in cromwell
+    call concatFastqsTask.concat_fastqs {
         input:
-        runfolder_dir = runfolder_dir,
-        output_dir = output_dir
+            fastq_dir = fastq_dir
     }
 
-    scatter (f in bcl2fastq.fastq_files) {
+# fastQC reports
+    scatter (f in concat_fastqs.fastq_files) {
         call fastqcTask.fastqc {
             input:
-                fastq_file = f
+                 fastq_file = f
         }
     }
 
-    # Check whether genome has been indexed; index if not
+# multiQC report
+    call multiqcTask.multiqc {
+        input:
+            fastqc_outputs = flatten(fastqc.fastqc_output)
+    }
+
+# Check whether genome has been indexed; index if not
     call indexTask.check_index {
         input:
             ref_genome = ref_genome
@@ -43,47 +56,44 @@ workflow main {
         }
     }
 
-    # glob all indexed ref genome files
+# concatenate indexed ref genome files 
     call alignmentTask.concat_refs {
         input:
         ref_genome = ref_genome
     }
 
-    # convert to SAM 
+# convert to SAM 
     call alignmentTask.generate_sam {
         input:
             ref_indexed = concat_refs.ref_indexed,
-            fastq_files = bcl2fastq.fastq_files,
+            fastq_files = concat_fastqs.fastq_files,
             ref_genome_fa = ref_genome_fa
     }
 
-    # convert to BAM -> run variant caller
-
-    ### NOTE:
-    # Bam and sam files all get generated successfully; 
-    # need to figure out how to pass in the bam files as input for variantcalling.
-    # (cause they all get scattered. Error: "expected File instead of Array[File]")
-
+# SAM to BAM
     scatter (f in generate_sam.sam_files) {
         call alignmentTask.generate_bam {
             input:
                 sam_file = f
         }
-        call variantCallingTask.octopus_caller {
-            input:
-                ref_genome_fa = ref_genome_fa,
-                bam_file = generate_bam.bam_file
-        }
     }
 
+# variant calling (octopus)
+    scatter (pair in generate_bam.bam_bai_pair) {
+        call variantCallingTask.octopus_caller {
+            input:
+                ref_indexed = concat_refs.ref_indexed,
+                ref_genome_fa = ref_genome_fa,
+                bam_file = pair.left,
+                bai_file = pair.right
+        }
+    }
 
 ########### OUTPUTS #####################
 
      output {
-        Array[File] fastq_files = bcl2fastq.fastq_files
-        Array[File] fastqc_output = flatten(fastqc.fastqc_output) # flatten nested array
-        Array[File] sam_files = generate_sam.sam_files
-        Array[File] bam_files = generate_bam.bam_file
+        File multiqc_report = multiqc.multiqc_report
+        File multiqc_data = multiqc.multiqc_data
         Array[File] vcf_files = octopus_caller.vcf_file
      }
 

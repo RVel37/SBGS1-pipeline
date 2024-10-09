@@ -1,5 +1,5 @@
 {
-  "main.aligned": "/mnt/data1/working_directory/ray/SBGS1-pipeline/aligned",
+  "main.fastq_dir": "/mnt/data1/working_directory/ray/SBGS1-pipeline/inputs/fastq_input",
 
   "main.output_dir": "/mnt/data1/working_directory/ray/SBGS1-pipeline/outputs",
   

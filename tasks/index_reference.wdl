@@ -5,12 +5,10 @@ task check_index {
         String ref_genome
     }
 
-    command <<<
-        
+    command <<< 
         # check whether ref_genome.fa.* files exist (i.e. genome is indexed)
 
         if [ "$(ls ~{ref_genome}/*.fa.* 2>/dev/null | wc -l)" -gt 0 ]; then
-
             echo "true" > is_indexed.txt
         else 
             echo "false" > is_indexed.txt

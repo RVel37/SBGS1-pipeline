@@ -1,6 +1,6 @@
 version 1.0
 
-task multiqc_task {
+task multiqc {
     input {
         Array[File] fastqc_outputs
     }

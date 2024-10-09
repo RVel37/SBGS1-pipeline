@@ -4,7 +4,7 @@ task octopus_caller {
     input {
         File bam_file
         File bai_file
-        File ref_genome_fa ### possible to omit and improve speed?
+        File ref_genome_fa 
         Array[File] ref_indexed
     }
 
