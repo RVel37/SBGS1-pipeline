@@ -15,12 +15,17 @@ workflow main {
 
 ############ TASKS ######################
 
+    # glob all indexed ref genome files
+    call alignmentTask.concat_refs {
+        input:
+        ref_genome = ref_genome
+    }
+
+
     call concatSamsTask.concat_sams {
         input:
             aligned = aligned
     }
-
-    # convert to BAM -> run variant caller
 
     scatter (f in concat_sams.sam_files) {
         call alignmentTask.generate_bam {
@@ -28,14 +33,14 @@ workflow main {
                 sam_file = f
         }
     }
-    
-# java.io.FileNotFoundException: Could not process output, file not found: /mnt/data1/working_directory/ray/SBGS1-pipeline/cromwell-executions/main/46253d8f-4901-48a5-b842-3ac455c2075d/call-generate_bam/shard-9/execution/bam_aligned/*_sorted.bam
 
-    scatter (f in generate_bam.bam_file) {
+    scatter (pair in generate_bam.bam_bai_pair) {
         call variantCallingTask.octopus_caller {
             input:
+                ref_indexed = concat_refs.ref_indexed,
                 ref_genome_fa = ref_genome_fa,
-                bam_file = f
+                bam_file = pair.left,
+                bai_file = pair.right
         }
     }
 

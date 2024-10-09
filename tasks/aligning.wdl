@@ -1,5 +1,6 @@
 version 1.0
 
+########### MAKE REF GENOME DIR ##############
 task concat_refs {
     input {
         String ref_genome
@@ -17,7 +18,7 @@ task concat_refs {
 
 }
 
-
+############### MAKE SAMS ####################
 task generate_sam {
 
     input {
@@ -48,7 +49,7 @@ task generate_sam {
     >>>
     
     output {
-        Array[File] sam_files = glob("aligned/*[!gz].sam") # exclude gz files to save time??
+        Array[File] sam_files = glob("aligned/*[!gz].sam")
     }
 
     runtime {
@@ -56,9 +57,7 @@ task generate_sam {
     }
 }
 
-
-#### only task that's relevant for bam -> vc test ####
-
+############### MAKE BAMS ####################
 task generate_bam {
 
     input {
@@ -72,12 +71,14 @@ task generate_bam {
         BASE=$(basename ~{sam_file} .sam)
         OUTPUT_BAM=bam_aligned/${BASE}_sorted.bam
         samtools view -bS ~{sam_file} | samtools sort -o $OUTPUT_BAM
-        #samtools index $OUTPUT_BAM     #(provided indexing command here, not required for our variant caller)
+        samtools index $OUTPUT_BAM 
 
     >>>
 
     output {
         File bam_file = "bam_aligned/${basename(sam_file, '.sam')}_sorted.bam"
+        File bai_file = "bam_aligned/${basename(sam_file, '.sam')}_sorted.bam.bai"
+        Pair[File, File] bam_bai_pair = (bam_file, bai_file) # concat pairs
     }
 
     runtime {
