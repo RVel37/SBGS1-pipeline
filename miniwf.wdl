@@ -10,7 +10,7 @@ workflow main {
         String output_dir
         String ref_genome
         File ref_genome_fa
-        String aligned
+        String aligned  ### temp dir for testing
     }
 
 ############ TASKS ######################
@@ -27,19 +27,24 @@ workflow main {
             input:
                 sam_file = f
         }
+    }
+    
+# java.io.FileNotFoundException: Could not process output, file not found: /mnt/data1/working_directory/ray/SBGS1-pipeline/cromwell-executions/main/46253d8f-4901-48a5-b842-3ac455c2075d/call-generate_bam/shard-9/execution/bam_aligned/*_sorted.bam
+
+    scatter (f in generate_bam.bam_file) {
         call variantCallingTask.octopus_caller {
             input:
                 ref_genome_fa = ref_genome_fa,
-                bam_file = generate_bam.bam_file
+                bam_file = f
         }
     }
 
 
 ########### OUTPUTS #####################
 
-     output {
-        Array[File] bam_files = generate_bam.bam_file
-        Array[File] vcf_files = octopus_caller.vcf_file
-     }
+#  output {
+#     Array[File] bam_files = generate_bam.bam_file
+#     Array[File] vcf_files = octopus_caller.vcf_file
+#  }
 
 }

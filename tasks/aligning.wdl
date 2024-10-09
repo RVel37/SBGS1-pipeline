@@ -48,7 +48,7 @@ task generate_sam {
     >>>
     
     output {
-        Array[File] sam_files = glob("aligned/*[!gz].sam")
+        Array[File] sam_files = glob("aligned/*[!gz].sam") # exclude gz files to save time??
     }
 
     runtime {
@@ -56,6 +56,8 @@ task generate_sam {
     }
 }
 
+
+#### only task that's relevant for bam -> vc test ####
 
 task generate_bam {
 
@@ -75,7 +77,7 @@ task generate_bam {
     >>>
 
     output {
-        File bam_file = "bam_aligned/*_sorted.bam"
+        File bam_file = "bam_aligned/${basename(sam_file, '.sam')}_sorted.bam"
     }
 
     runtime {

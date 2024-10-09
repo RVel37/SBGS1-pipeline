@@ -1,6 +1,7 @@
 {
-  "main.runfolder_dir": "/mnt/data1/working_directory/ray/resources/runfolder",
-  "main.output_dir": "/mnt/data1/working_directory/ray/SBGS1/outputs",
+  "main.aligned": "/mnt/data1/working_directory/ray/SBGS1-pipeline/aligned",
+
+  "main.output_dir": "/mnt/data1/working_directory/ray/SBGS1-pipeline/outputs",
   
   "main.ref_genome": "/mnt/data1/working_directory/ray/resources/GRCh38",
   
