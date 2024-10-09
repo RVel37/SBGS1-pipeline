@@ -1,5 +1,6 @@
 version 1.0
 
+########### MAKE REF GENOME DIR ##############
 task concat_refs {
     input {
         String ref_genome
@@ -17,7 +18,7 @@ task concat_refs {
 
 }
 
-
+############### MAKE SAMS ####################
 task generate_sam {
 
     input {
@@ -42,7 +43,7 @@ task generate_sam {
             BASE=$(basename $R1 _R1_001.fastq.gz) 
             OUTPUT_SAM=aligned/${BASE}.sam
 
-            bwa-mem2 mem GRCh38/~{basename(ref_genome_fa)} $R1 $R2 > $OUTPUT_SAM 
+            bwa-mem2 mem -R "@RG\tID:${BASE}\tSM:${BASE}\tPL:ILLUMINA" GRCh38/~{basename(ref_genome_fa)} $R1 $R2 > $OUTPUT_SAM 
 
         done
     >>>
@@ -56,7 +57,7 @@ task generate_sam {
     }
 }
 
-
+############### MAKE BAMS ####################
 task generate_bam {
 
     input {
@@ -70,12 +71,14 @@ task generate_bam {
         BASE=$(basename ~{sam_file} .sam)
         OUTPUT_BAM=bam_aligned/${BASE}_sorted.bam
         samtools view -bS ~{sam_file} | samtools sort -o $OUTPUT_BAM
-        #samtools index $OUTPUT_BAM     #(provided indexing command here, not required for our variant caller)
+        samtools index $OUTPUT_BAM 
 
     >>>
 
     output {
-        File bam_file = "bam_aligned/*_sorted.bam"
+        File bam_file = "bam_aligned/${basename(sam_file, '.sam')}_sorted.bam"
+        File bai_file = "bam_aligned/${basename(sam_file, '.sam')}_sorted.bam.bai"
+        Pair[File, File] bam_bai_pair = (bam_file, bai_file) # concat pairs
     }
 
     runtime {

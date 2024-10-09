@@ -4,3 +4,4 @@ resources/
 cromwell-executions/
 cromwell-workflow-logs/
 outputs/
+aligned/
