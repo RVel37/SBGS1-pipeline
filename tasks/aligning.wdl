@@ -43,7 +43,7 @@ task generate_sam {
             BASE=$(basename $R1 _R1_001.fastq.gz) 
             OUTPUT_SAM=aligned/${BASE}.sam
 
-            bwa-mem2 mem GRCh38/~{basename(ref_genome_fa)} $R1 $R2 > $OUTPUT_SAM 
+            bwa-mem2 mem -R "@RG\tID:${BASE}\tSM:${BASE}\tPL:ILLUMINA" GRCh38/~{basename(ref_genome_fa)} $R1 $R2 > $OUTPUT_SAM 
 
         done
     >>>
