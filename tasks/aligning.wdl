@@ -70,8 +70,8 @@ task generate_bam {
 
         BASE=$(basename ~{sam_file} .sam)
         OUTPUT_BAM=bam_aligned/${BASE}_sorted.bam
-        samtools view -bS ~{sam_file} | samtools sort -o $OUTPUT_BAM # create sorted BAM
-        samtools index $OUTPUT_BAM # create corresponding BAI (index file)
+        samtools view -bS ~{sam_file} | samtools sort -o $OUTPUT_BAM
+        samtools index $OUTPUT_BAM 
 
     >>>
 

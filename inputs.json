@@ -1,5 +1,5 @@
 {
-  "main.fastq_dir": "/mnt/data1/working_directory/ray/SBGS1-pipeline/inputs/fastq_input",
+  "main.runfolder_dir": "/mnt/data1/working_directory/ray/resources/runfolder",
 
   "main.output_dir": "/mnt/data1/working_directory/ray/SBGS1-pipeline/outputs",
   
