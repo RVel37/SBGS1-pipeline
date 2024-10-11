@@ -16,7 +16,7 @@ task octopus_caller {
     octopus \
     --reference GRCh38/~{basename(ref_genome_fa)} \
     --reads ~{bam_file} \
-    --output vc_output/output.vcf
+    --output vc_output/${basename(bam_file, '.bam')}.vcf
 
     >>>
 
