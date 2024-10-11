@@ -1,0 +1,21 @@
+version: '3'
+services:
+  bwamem2:
+    image: swglh/bwamem2:v2.2.1
+  bwa:
+    image: biocontainers/bwa:v0.7.17_cv1
+  samtools:
+    image: swglh/samtools:1.18
+  ensembl-vep:
+    image: ensemblorg/ensembl-vep:release_88.14
+  fastqc:
+    image: staphb/fastqc:0.12.1
+  multiqc:
+    image: multiqc/multiqc:v1.25.1
+  octopus:
+    image: octopus:invitae--36017c2d_0
+  
+
+#### REMEMBER TO ADD MORE
+
+# usage: docker-compose up
