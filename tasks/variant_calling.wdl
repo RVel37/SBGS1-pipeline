@@ -25,6 +25,6 @@ task octopus_caller {
     }
 
     runtime {
-        docker: "dancooke/octopus:latest"
+        docker: "dancooke/octopus:invitae--eae1ab48_0"
     }
 }
