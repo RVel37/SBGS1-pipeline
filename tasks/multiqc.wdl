@@ -16,6 +16,6 @@ task multiqc {
     }
 
     runtime {
-        docker: "multiqc/multiqc:latest"
+        docker: "multiqc/multiqc:v1.25.1"
     }
 }
