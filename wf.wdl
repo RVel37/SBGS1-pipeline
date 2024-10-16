@@ -9,6 +9,7 @@ import "tasks/index_reference.wdl" as indexTask
 import "tasks/fastqc.wdl" as fastqcTask
 import "tasks/aligning.wdl" as alignmentTask
 import "tasks/variant_calling.wdl" as variantCallingTask
+import "tasks/annotation.wdl" as annotationTask
 
 workflow main {
 
@@ -19,6 +20,7 @@ workflow main {
         String output_dir
         String ref_genome
         File ref_genome_fa
+        File vep_cache
     }
 
 ############ TASKS ######################
@@ -88,13 +90,22 @@ workflow main {
                 bai_file = pair.right
         }
     }
-
+  
+# Annotation (VEP)
+    scatter (vcf in vcf_files) {
+        call annotationTask.VEP_annotation {
+            input: 
+                vcf = vcf,
+                vep_cache = vep_cache
+        }
+    }
 ########### OUTPUTS #####################
 
      output {
         File multiqc_report = multiqc.multiqc_report
         File multiqc_data = multiqc.multiqc_data
         Array[File] vcf_files = octopus_caller.vcf_file
+        Array[File] annotated_files = VEP_annotation.annotation_output
      }
 
 }
