@@ -1,9 +1,11 @@
 {
-  "main.fastq_dir": "/mnt/data1/working_directory/ollie/SBGS1-pipeline/smallinputs/fastq_input",
+  "main.fastq_dir": "/mnt/data1/working_directory/ollie/SBGS1-pipeline/smallinputs/fastq_input/",
 
   "main.output_dir": "/mnt/data1/working_directory/ollie/SBGS1-pipeline/outputs",
   
   "main.ref_genome": "/mnt/data1/working_directory/ollie/resources/GRCh38",
   
-  "main.ref_genome_fa": "/mnt/data1/working_directory/ollie/resources/GRCh38/GRCh38_masked_v2_decoy_excludes_GPRIN2_DUSP22_FANCD2.fa"
+  "main.ref_genome_fa": "/mnt/data1/working_directory/ollie/resources/GRCh38/GRCh38_masked_v2_decoy_excludes_GPRIN2_DUSP22_FANCD2.fa",
+  
+  "main.vep_cache": "/mnt/data1/working_directory/ollie/SBGS1-pipeline/VEP_cache/homo_sapiens_vep_112_GRCh38.tar.gz"
 }
