@@ -1,4 +1,4 @@
 {
-    "final_workflow_outputs_dir": "/mnt/data1/working_directory/ray/SBGS1-pipeline/cromwell-outputs",
+    "final_workflow_outputs_dir": "/mnt/data1/working_directory/Milad/SBGS1-pipeline/cromwell-outputs",
     "use_relative_output_paths": true
 }
