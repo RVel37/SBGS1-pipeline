@@ -1,9 +1,6 @@
 {
-  "main.fastq_dir": "/mnt/data1/working_directory/ray/SBGS1-pipeline/inputs/fastq_input",
-
-  "main.output_dir": "/mnt/data1/working_directory/ray/SBGS1-pipeline/outputs",
-  
-  "main.ref_genome": "/mnt/data1/working_directory/ray/resources/GRCh38",
-  
-  "main.ref_genome_fa": "/mnt/data1/working_directory/ray/resources/GRCh38/GRCh38_masked_v2_decoy_excludes_GPRIN2_DUSP22_FANCD2.fa"
-}
+    "main.fastq_dir": "/mnt/data1/working_directory/Milad/ignored2_SBGS1-pipeline/inputs",
+    "main.adapter_file": "/mnt/data1/working_directory/Milad/resources/Adapters.fa",
+    "main.ref_genome": "/mnt/data1/working_directory/Milad/resources/GRCh38",
+    "main.ref_genome_fa": "/mnt/data1/working_directory/Milad/resources/GRCh38/GRCh38_masked_v2_decoy_excludes_GPRIN2_DUSP22_FANCD2.fa"
+}   
