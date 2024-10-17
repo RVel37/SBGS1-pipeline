@@ -1,6 +1,7 @@
 version 1.0
 
 ########### MAKE REF GENOME DIR ##############
+
 task concat_refs {
     input {
         String ref_genome
@@ -15,15 +16,15 @@ task concat_refs {
     output {
         Array[File] ref_indexed = glob("~{ref_genome}/*")
     }
-
 }
 
 ############### MAKE SAMS ####################
+
 task generate_sam {
 
     input {
         Array[File] ref_indexed
-        Array[File] fastq_files
+        Array[File] trimmed_fastq_files
         File ref_genome_fa
     }
 
@@ -34,20 +35,23 @@ task generate_sam {
         # move to same dir
         mv ~{sep=' ' ref_indexed} GRCh38
 
+
         # run bwa mem (requires indexed genome)
         ## note: only works for this fastq naming convention
 
-        for R1 in ~{sep=" " fastq_files}; do
+        for R1 in ~{sep=" " trimmed_fastq_files}; do
+            
+            CHECKREAD=$(basename $R1 | cut -d '_' -f5)
+            if [ $CHECKREAD = "R1" ] ; then
+                R2=${R1/_R1_001_paired.fastq.gz/_R2_001_paired.fastq.gz}
+                BASE=$(basename $R1 | cut -d'_' -f1-4)
+                OUTPUT_SAM=aligned/${BASE}.sam
 
-            R2=${R1/_R1_001.fastq.gz/_R2_001.fastq.gz}
-            BASE=$(basename $R1 _R1_001.fastq.gz) 
-            OUTPUT_SAM=aligned/${BASE}.sam
-
-            bwa-mem2 mem -R "@RG\tID:${BASE}\tSM:${BASE}\tPL:ILLUMINA" GRCh38/~{basename(ref_genome_fa)} $R1 $R2 > $OUTPUT_SAM 
-
+                bwa-mem2 mem -R "@RG\tID:${BASE}\tSM:${BASE}\tPL:ILLUMINA" GRCh38/~{basename(ref_genome_fa)} $R1 $R2 > $OUTPUT_SAM 
+            fi
         done
     >>>
-    
+
     output {
         Array[File] sam_files = glob("aligned/*[!gz].sam")
     }
@@ -57,7 +61,9 @@ task generate_sam {
     }
 }
 
+
 ############### MAKE BAMS ####################
+
 task generate_bam {
 
     input {
@@ -72,7 +78,6 @@ task generate_bam {
         OUTPUT_BAM=bam_aligned/${BASE}_sorted.bam
         samtools view -bS ~{sam_file} | samtools sort -o $OUTPUT_BAM # create sorted BAM
         samtools index $OUTPUT_BAM # create corresponding BAI (index file)
-
     >>>
 
     output {
@@ -85,3 +90,4 @@ task generate_bam {
         docker: "swglh/samtools:1.18"
     }
 }
+
