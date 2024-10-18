@@ -3,10 +3,14 @@ version 1.0
 import "tasks/concat_fastqs.wdl" as concat_fastqsTask
 import "tasks/trimming.wdl" as trimmingTask
 import "tasks/fastqc.wdl" as fastqcTask
-import "tasks/multiqc.wdl" as multiqcTask
+import "tasks/pre-multiqc.wdl" as premultiqcTask
 import "tasks/index_reference.wdl" as indexTask
 import "tasks/aligning.wdl" as alignmentTask
+import "tasks/markduplicates.wdl" as markDuplicatesTask
+import "tasks/samtools_stats.wdl" as samtoolsStatsTask
+import "tasks/post-multiqc.wdl" as postmultiqcTask
 import "tasks/variant_calling.wdl" as variantCallingTask
+
 
 workflow main {
     input {
@@ -38,7 +42,7 @@ workflow main {
     }
 
     #MultiQC
-    call multiqcTask.multiqc {
+    call premultiqcTask.multiqc {
         input:
             fastqc_outputs = flatten(fastqc.fastqc_output)
     }
@@ -78,8 +82,31 @@ workflow main {
         }
     }
 
-    # variant calling (octopus)
-    scatter (pair in generate_bam.bam_bai_pair) {
+    # Mark duplicates in BAM files
+    scatter (f in generate_bam.bam_file) {
+        call markDuplicatesTask.mark_duplicates {
+            input:
+                bam_file = f
+        }
+    }
+
+    # Generate BAM statistics (Samtools stats) for each BAM file
+    scatter (f in mark_duplicates.dedup_bam) {
+        call samtoolsStatsTask.samtools_stats {
+            input:
+                bam_file = f
+        }
+    }
+
+    # New MultiQC for post-processing
+    call postmultiqcTask.multiqc_postprocessing {
+        input:
+            bam_stats_files = flatten(samtools_stats.stats_files),
+            duplication_metrics_files = flatten(mark_duplicates.duplication_metrics)
+    }
+
+    # Variant calling (octopus) on deduplicated BAMs
+    scatter (pair in mark_duplicates.dedup_bam_bai_pair) {
         call variantCallingTask.octopus_caller {
             input:
                 ref_indexed = concat_refs.ref_indexed,
@@ -93,6 +120,8 @@ workflow main {
     output {
         File multiqc_report = multiqc.multiqc_report
         File multiqc_data = multiqc.multiqc_data
+        File postprocessing_multiqc_report = multiqc_postprocessing.postprocessing_multiqc_report
+        File postprocessing_multiqc_data = multiqc_postprocessing.postprocessing_multiqc_data
         Array[File] vcf_files = octopus_caller.vcf_file
     }
 }
