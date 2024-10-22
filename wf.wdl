@@ -1,5 +1,6 @@
 version 1.0
 
+import "tasks/random_num.wdl" as randomnumTask
 import "tasks/concat_fastqs.wdl" as concat_fastqsTask
 import "tasks/trimming.wdl" as trimmingTask
 import "tasks/fastqc.wdl" as fastqcTask
@@ -19,6 +20,9 @@ workflow main {
         String ref_genome
         File ref_genome_fa
     }
+
+    #Generate a random number for the run 
+    call randomnumTask.generate_random_number 
 
     #Concat_fastQs into an Array[File]
     call concat_fastqsTask.concat_fastqs_task {
@@ -44,7 +48,8 @@ workflow main {
     #MultiQC
     call premultiqcTask.multiqc {
         input:
-            fastqc_outputs = flatten(fastqc.fastqc_output)
+            fastqc_outputs = flatten(fastqc.fastqc_output),
+            random_number = generate_random_number.random_number
     }
 
     # Check whether genome has been indexed; index if not
@@ -102,7 +107,8 @@ workflow main {
     call postmultiqcTask.multiqc_postprocessing {
         input:
             bam_stats_files = flatten(samtools_stats.stats_files),
-            duplication_metrics_files = flatten(mark_duplicates.duplication_metrics)
+            duplication_metrics_files = flatten(mark_duplicates.duplication_metrics),
+            random_number = generate_random_number.random_number
     }
 
     # Variant calling (octopus) on deduplicated BAMs
@@ -112,7 +118,8 @@ workflow main {
                 ref_indexed = concat_refs.ref_indexed,
                 ref_genome_fa = ref_genome_fa,
                 bam_file = pair.left,
-                bai_file = pair.right
+                bai_file = pair.right,
+                random_number = generate_random_number.random_number
         }
     }
 
