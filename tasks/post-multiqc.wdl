@@ -14,8 +14,8 @@ task multiqc_postprocessing {
     >>>
 
     output {
-        File postprocessing_multiqc_report = "runnumber_~{random_number}/post_multiqc_dir/post_multiqc_report.html"
-        File postprocessing_multiqc_data = "runnumber_~{random_number}/post_multiqc_dir/post_multiqc_data"
+        File postprocessing_multiqc_report = "runnumber_~{random_number}/post_multiqc_dir/multiqc_report.html"
+        File postprocessing_multiqc_data = "runnumber_~{random_number}/post_multiqc_dir/multiqc_data"
     }
 
     runtime {
