@@ -6,11 +6,13 @@ task octopus_caller {
         File bai_file
         File ref_genome_fa 
         Array[File] ref_indexed
+        Int random_number
     }
 
     command <<<
-
-    mkdir vcf_output; mkdir GRCh38
+    mkdir -p runnumber_~{random_number}
+    mkdir runnumber_~{random_number}/vcf_output
+    mkdir GRCh38
     mv ~{sep=' ' ref_indexed} GRCh38
     
     BASE=$(basename ~{bam_file} .bam).vcf
@@ -18,12 +20,12 @@ task octopus_caller {
     octopus \
     --reference GRCh38/~{basename(ref_genome_fa)} \
     --reads ~{bam_file} \
-    --output vcf_output/$BASE
+    --output runnumber_~{random_number}/vcf_output/$BASE
 
     >>>
 
     output {
-        File vcf_file = "vcf_output/~{basename(bam_file, '.bam')}.vcf"
+        File vcf_file = "runnumber_~{random_number}/vcf_output/~{basename(bam_file, '.bam')}.vcf"
     }
 
     runtime {
