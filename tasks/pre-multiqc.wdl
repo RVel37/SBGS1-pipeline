@@ -3,16 +3,18 @@ version 1.0
 task multiqc {
     input {
         Array[File] fastqc_outputs
+        Int random_number
     }
 
     command <<<
-        mkdir dir_multiqc
-        multiqc ~{sep= ' ' fastqc_outputs} -o dir_multiqc
+        mkdir runnumber_~{random_number}
+        mkdir runnumber_~{random_number}/dir_multiqc
+        multiqc ~{sep= ' ' fastqc_outputs} -o runnumber_~{random_number}/dir_multiqc
     >>>
 
     output {
-        File multiqc_report = "dir_multiqc/multiqc_report.html"
-        File multiqc_data = "dir_multiqc/multiqc_data"
+        File multiqc_report = "runnumber_~{random_number}/dir_multiqc/multiqc_report.html"
+        File multiqc_data = "runnumber_~{random_number}/dir_multiqc/multiqc_data"
     }
 
     runtime {
