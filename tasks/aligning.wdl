@@ -41,7 +41,6 @@ task generate_sam {
 
         # define output SAM file
         OUTPUT_SAM=aligned/${BASE}.sam
-        echo "Output SAM: $OUTPUT_SAM"
 
         # run bwa mem 2 using original FASTQ paths
         bwa-mem2 mem -R "@RG\tID:${BASE}\tSM:${BASE}\tPL:ILLUMINA" GRCh38/~{basename(ref_genome_fa)} ~{forward_read} ~{reverse_read} > $OUTPUT_SAM 
