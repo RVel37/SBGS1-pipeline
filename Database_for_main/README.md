@@ -2,29 +2,6 @@
 
 This project sets up a bioinformatics pipeline that processes run data from the Cromwell outputs directory, including VCF files and MultiQC reports, and inserts this information into a MySQL database running inside a Docker container. The script monitors the cromwell-outputs directory for new runs and automatically adds details to the database.
 
-## Table of Contents
-
-	1.	Project Structure
-	2.	Setup Instructions
-	3.	Database Schema
-	4.	Running the Pipeline
-	5.	Troubleshooting
-
-## Project Structure
-
-The folder structure for this project should look like this:
-.
-├── Data_insertion.py                  # Python script that monitors the cromwell-outputs directory
-├── README.md                          # This README file
-├── cromwell-outputs/                  # Directory monitored for new runs
-    └── runnumber_1234/                # Example run directory
-       ├── dir_multiqc/
-       │   └── multiqc_report.html    # Pre-processing MultiQC report
-       ├── post_multiqc_dir/
-       │   └── multiqc_report.html    # Post-processing MultiQC report
-       └── vcf_output/
-           └── sample1.vcf            # VCF files with variants
-
 
 ## Setup Instructions
 
@@ -75,16 +52,7 @@ docker start db-container
 python Data_insertion.py
 
 
-	3.	Add new run folders to the cromwell-outputs directory. Each folder should follow this structure:
-
-runnumber_1234/
-├── dir_multiqc/
-│   └── multiqc_report.html
-├── post_multiqc_dir/
-│   └── multiqc_report.html
-└── vcf_output/
-    └── sample1.vcf
-
+	3.	Add new run folders to the cromwell-outputs directory. 
 
 	4.	Verify the data is inserted into the MySQL database:
 
