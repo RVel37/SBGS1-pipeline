@@ -66,7 +66,7 @@ The folder structure for this project should look like this:
 
 If the container is stopped, start it with:
 
-	docker start db-container
+		docker start db-container
 
 
 2.	Run the Python script to monitor the cromwell-outputs directory for new runs: 
