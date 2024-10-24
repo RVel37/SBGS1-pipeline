@@ -107,25 +107,25 @@ The MySQL database contains the following tables:
 ## Troubleshooting
 
 1.	Docker Container Issues:
-	•	If you receive a container name conflict error, list all containers (running and stopped) using:
+	-	If you receive a container name conflict error, list all containers (running and stopped) using:
 
-		docker ps -a
+			docker ps -a
 
 
-	•	Then remove any stopped container with:
+	-	Then remove any stopped container with:
 
-		docker rm <container_id>
+			docker rm <container_id>
 
 
 2.	Database Connection Issues:
    
-	•	Ensure that the db_config['host'] in your Python script points to the correct IP address for the Docker container. You can get the container’s IP by running:
+	-	Ensure that the db_config['host'] in your Python script points to the correct IP address for the Docker container. You can get the container’s IP by running:
 
-		docker inspect db-container | grep IPAddress
+			docker inspect db-container | grep IPAddress
 
 
-	3.	Monitoring Logs:
+3.	Monitoring Logs:
     
-	•	If the Python script isn’t working as expected, add print() statements in key parts of the script to output logs for debugging.
+	-	If the Python script isn’t working as expected, add print() statements in key parts of the script to output logs for debugging.
 
 
