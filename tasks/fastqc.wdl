@@ -16,7 +16,7 @@ task fastqc {
     output {
         Array[File] fastqc_output = glob("dir_fastqc/*.{zip,html}")
     }
-
+    
     runtime {
         docker: "staphb/fastqc:0.12.1"
     }
