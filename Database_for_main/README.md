@@ -98,11 +98,11 @@ If the container is stopped, start it with:
 
 The MySQL database contains the following tables:
 
-•	runs: Tracks each run folder and its metadata.
-•	pre_multiqc_reports: Stores paths to pre-processing MultiQC reports.
-•	post_multiqc_reports: Stores paths to post-processing MultiQC reports.
-•	vcf_files: Stores the VCF file for each sample.
-•	vcf_variants: Stores details of individual variants from the annotated VCF files.
+-	runs: Tracks each run folder and its metadata.
+-	pre_multiqc_reports: Stores paths to pre-processing MultiQC reports.
+-	post_multiqc_reports: Stores paths to post-processing MultiQC reports.
+-	vcf_files: Stores the VCF file for each sample.
+-	vcf_variants: Stores details of individual variants from the annotated VCF files.
 
 ## Troubleshooting
 
@@ -118,12 +118,14 @@ The MySQL database contains the following tables:
 
 
 2.	Database Connection Issues:
+   
 	•	Ensure that the db_config['host'] in your Python script points to the correct IP address for the Docker container. You can get the container’s IP by running:
 
 		docker inspect db-container | grep IPAddress
 
 
 	3.	Monitoring Logs:
+    
 	•	If the Python script isn’t working as expected, add print() statements in key parts of the script to output logs for debugging.
 
 
