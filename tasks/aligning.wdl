@@ -18,6 +18,8 @@ task concat_refs {
 
 }
 
+
+
 ############### MAKE SAMS ####################
 task generate_sam {
 
@@ -57,6 +59,11 @@ task generate_sam {
     }
 }
 
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
 ############### MAKE BAMS ####################
 task generate_bam {
 
