@@ -1,6 +1,7 @@
 version 1.0
 
 ########### MAKE REF GENOME DIR ##############
+
 task concat_refs {
     input {
         String ref_genome
@@ -15,43 +16,40 @@ task concat_refs {
     output {
         Array[File] ref_indexed = glob("~{ref_genome}/*")
     }
-
 }
 
 
-
 ############### MAKE SAMS ####################
-task generate_sam {
 
+task generate_sam {
     input {
         Array[File] ref_indexed
-        Array[File] fastq_files
+        File forward_read
+        File reverse_read
         File ref_genome_fa
     }
 
     command <<<
 
-        mkdir aligned; mkdir GRCh38
+        mkdir aligned GRCh38
 
-        # move to same dir
+        # move reference files to temp dir
         mv ~{sep=' ' ref_indexed} GRCh38
 
-        # run bwa mem (requires indexed genome)
-        ## note: only works for this fastq naming convention
+        # define naming convention for SAM files
+        BASE=$(basename ~{forward_read} _R1_001.fastq.gz)
 
-        for R1 in ~{sep=" " fastq_files}; do
+        # define output SAM file
+        OUTPUT_SAM=aligned/${BASE}.sam
+        echo "Output SAM: $OUTPUT_SAM"
 
-            R2=${R1/_R1_001.fastq.gz/_R2_001.fastq.gz}
-            BASE=$(basename $R1 _R1_001.fastq.gz) 
-            OUTPUT_SAM=aligned/${BASE}.sam
+        # run bwa mem 2 using original FASTQ paths
+        bwa-mem2 mem -R "@RG\tID:${BASE}\tSM:${BASE}\tPL:ILLUMINA" GRCh38/~{basename(ref_genome_fa)} ~{forward_read} ~{reverse_read} > $OUTPUT_SAM 
 
-            bwa-mem2 mem -R "@RG\tID:${BASE}\tSM:${BASE}\tPL:ILLUMINA" GRCh38/~{basename(ref_genome_fa)} $R1 $R2 > $OUTPUT_SAM 
-
-        done
     >>>
-    
+
     output {
-        Array[File] sam_files = glob("aligned/*[!gz].sam")
+        Array[File] sam_files = glob("aligned/*.sam")
     }
 
     runtime {
@@ -59,12 +57,10 @@ task generate_sam {
     }
 }
 
-<<<<<<< Updated upstream
-=======
 
 
->>>>>>> Stashed changes
 ############### MAKE BAMS ####################
+
 task generate_bam {
 
     input {
@@ -79,7 +75,6 @@ task generate_bam {
         OUTPUT_BAM=bam_aligned/${BASE}_sorted.bam
         samtools view -bS ~{sam_file} | samtools sort -o $OUTPUT_BAM # create sorted BAM
         samtools index $OUTPUT_BAM # create corresponding BAI (index file)
-
     >>>
 
     output {
