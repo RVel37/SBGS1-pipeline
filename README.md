@@ -25,4 +25,9 @@ FASTQs were created using Bcl2Fastq and follow a specific naming convention.
 FASTQ file names must end in `_R1_001.fastq.gz` and `_R2_001.fastq.gz` for the pipeline to execute correctly. 
 
 ### Bcl2Fastq
-The branch `Bcl2Fastq` contains this additional step for those starting from BCL files. It is designed to work with the BCL file directory structure produced by Illumina sequencing systems. 
+The branch `Bcl2Fastq` contains this additional step for those starting from BCL files. It is designed to work with the BCL file directory structure produced by Illumina sequencing systems.
+
+## VEP annotation 
+VEP annotation of VCFs uses information from the base VEP cache (http://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#pre)
+as well as REVEL scores for misense variants.
+Only one transcript will be annotated per variant (see --pick)
