@@ -86,3 +86,4 @@ task generate_bam {
         docker: "swglh/samtools:1.18"
     }
 }
+
