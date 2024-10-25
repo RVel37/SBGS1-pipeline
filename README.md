@@ -14,11 +14,11 @@ Outputs can be set to a permanent directory using `options.json`. Alternatively,
 The paths in `inputs.json` should be set to the right directories. 
 
 Required inputs include;
-Directory of FASTQ files
-Indexed GRCh38 reference files
-Base VEP cache (https://ftp.ensembl.org/pub/release-112/variation/indexed_vep_cache/homo_sapiens_merged_vep_112_GRCh38.tar.gz)
-Revel cache data (tsv) and index file (tbi)
-Adapter sequence fasta
+- Directory of FASTQ files
+- Indexed GRCh38 reference files
+- Base VEP cache (https://ftp.ensembl.org/pub/release-112/variation/indexed_vep_cache/homo_sapiens_merged_vep_112_GRCh38.tar.gz)
+- Revel cache data (tsv) and index file (tbi)
+- Adapter sequence fasta
 
 ### Note on FASTQ file names
 FASTQs were created using Bcl2Fastq and follow a specific naming convention. 
