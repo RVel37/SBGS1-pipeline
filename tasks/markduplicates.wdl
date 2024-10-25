@@ -23,8 +23,8 @@ task mark_duplicates {
     >>>
 
     output {
-        File dedup_bam = "marked_duplicates/${basename(bam_file, '.bam')}_dedup.bam"
-        File dedup_bai = "marked_duplicates/${basename(bam_file, '.bam')}_dedup.bai"
+        File dedup_bam = "marked_duplicates/${basename(bam_file, '.bam')}_dedup.bam" # output BAM file w/ marked duplicates
+        File dedup_bai = "marked_duplicates/${basename(bam_file, '.bam')}_dedup.bai" # associated index file
         Pair[File, File] dedup_bam_bai_pair = (dedup_bam, dedup_bai) # concat pairs
         Array[File] duplication_metrics = glob("METRICS_DIR/*")
     }
