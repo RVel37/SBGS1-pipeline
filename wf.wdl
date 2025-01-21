@@ -13,31 +13,33 @@ import "tasks/post-multiqc.wdl" as postmultiqcTask
 import "tasks/variant_calling.wdl" as variantCallingTask
 
 
+### MAIN WORKFLOW ###
+
 workflow main {
     input {
-        String fastq_dir
-        File adapter_file
-        String ref_genome
-        File ref_genome_fa
+        String fastq_dir    # fastq input directory
+        File adapter_file   # adapters for trimming step
+        String ref_genome   # reference genome directory
+        File ref_genome_fa  # reference genome fasta file
     }
 
-    #Generate a random number for the run 
+    # Generate a random number for the run
     call randomnumTask.generate_random_number 
 
-    #Concat_fastQs into an Array[File]
+    # Concat FASTQs into an Array[File]
     call concat_fastqsTask.concat_fastqs_task {
         input:
             fastq_dir = fastq_dir
     }
 
-    #Trimming 
+    # Trimming (remove adapters to improve quality)
     call trimmingTask.trim_fastqs_task {
         input:
             fastq_files = concat_fastqs_task.fastq_array,
             adapter_file = adapter_file
     }
 
-    #FastQC
+    # FastQC
     scatter (f in trim_fastqs_task.paired_trimmed_files) {
         call fastqcTask.fastqc {
             input:
@@ -45,7 +47,7 @@ workflow main {
         }
     }
 
-    #MultiQC
+    # MultiQC
     call premultiqcTask.multiqc {
         input:
             fastqc_outputs = flatten(fastqc.fastqc_output),
@@ -53,13 +55,13 @@ workflow main {
     }
 
     # Check whether genome has been indexed; index if not
-    call indexTask.check_index {
+    call indexTask.check_index {    # checks whether genome was indexed
         input:
             ref_genome = ref_genome
     }
 
-    if (!check_index.is_indexed) {
-        call indexTask.index_ref {
+    if (!check_index.is_indexed) {  # if genome hasn't been indexed
+        call indexTask.index_ref {  # run indexing task
             input:
                 ref_genome = ref_genome
         }
@@ -124,6 +126,7 @@ workflow main {
     }
 
 
+### OUTPUTS ###
     output {
         File multiqc_report = multiqc.multiqc_report
         File multiqc_data = multiqc.multiqc_data

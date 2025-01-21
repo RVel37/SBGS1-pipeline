@@ -5,3 +5,4 @@ cromwell-executions/
 cromwell-workflow-logs/
 inputs/
 smallinputs/
+Database/database.sql
