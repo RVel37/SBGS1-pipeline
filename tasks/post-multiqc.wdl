@@ -8,9 +8,12 @@ task multiqc_postprocessing {
     }
 
     command <<<
-        mkdir -p runnumber_~{random_number}
-        mkdir runnumber_~{random_number}/post_multiqc_dir
-        multiqc ~{sep= ' ' bam_stats_files} ~{sep= ' ' duplication_metrics_files} -o runnumber_~{random_number}/post_multiqc_dir
+        mkdir -p runnumber_~{random_number} # make directory matching the run number
+        mkdir runnumber_~{random_number}/post_multiqc_dir # make subdir for multiqc
+
+        # run multiQC
+        multiqc ~{sep= ' ' bam_stats_files} ~{sep= ' ' duplication_metrics_files} \
+        -o runnumber_~{random_number}/post_multiqc_dir
     >>>
 
     output {

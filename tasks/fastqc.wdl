@@ -9,11 +9,13 @@ task fastqc {
     command <<<
 
         mkdir dir_fastqc
+        # run FastQC
         fastqc -o dir_fastqc --noextract ~{fastq_file}
         
     >>>
 
     output {
+        # output for each FASTQ is a zip and html file
         Array[File] fastqc_output = glob("dir_fastqc/*.{zip,html}")
     }
     

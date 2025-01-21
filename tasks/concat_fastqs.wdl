@@ -7,11 +7,13 @@ task concat_fastqs_task {
     }
 
     command <<<
-        mkdir temp_fastq_dir # temporary dir that is in cromwell sub_dir
+        # move FASTQs in temporary dir that makes them accessible to cromwell
+        mkdir temp_fastq_dir 
         cp ~{fastq_dir}/* temp_fastq_dir 
     >>>
 
     output {
+        # Directories can be stored as arrays of files
         Array[File] fastq_array = glob("~{fastq_dir}/*")
     }
 }
