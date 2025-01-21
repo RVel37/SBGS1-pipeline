@@ -15,12 +15,14 @@ task octopus_caller {
     mkdir GRCh38
     mv ~{sep=' ' ref_indexed} GRCh38
     
+    # basename for output vcf
     BASE=$(basename ~{bam_file} .bam).vcf
     
+    # run octopus
     octopus \
-    --reference GRCh38/~{basename(ref_genome_fa)} \
-    --reads ~{bam_file} \
-    --output runnumber_~{random_number}/vcf_output/$BASE
+    --reference GRCh38/~{basename(ref_genome_fa)} \         # reference genome
+    --reads ~{bam_file} \                                   # input bam
+    --output runnumber_~{random_number}/vcf_output/$BASE    # store output 
 
     >>>
 
