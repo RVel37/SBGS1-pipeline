@@ -2,7 +2,7 @@ version 1.0
 
 task generate_random_number {
     command <<<
-        # Using $RANDOM in bash to generate a random number
+        # generate a random number
         echo $((RANDOM))
     >>>
     

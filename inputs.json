@@ -1,9 +1,15 @@
 {
-  "main.fastq_dir": "/mnt/data1/working_directory/ray/SBGS1-pipeline/inputs/fastq_input",
+  "main.fastq_dir": "/mnt/data1/working_directory/ollie/SBGS1-pipeline/smallinputs/fastq_input",
+  
+  "main.ref_genome": "/mnt/data1/working_directory/ollie/resources/GRCh38",
+  
+  "main.ref_genome_fa": "/mnt/data1/working_directory/ollie/resources/GRCh38/GRCh38_masked_v2_decoy_excludes_GPRIN2_DUSP22_FANCD2.fa",
 
-  "main.output_dir": "/mnt/data1/working_directory/ray/SBGS1-pipeline/outputs",
-  
-  "main.ref_genome": "/mnt/data1/working_directory/ray/resources/GRCh38",
-  
-  "main.ref_genome_fa": "/mnt/data1/working_directory/ray/resources/GRCh38/GRCh38_masked_v2_decoy_excludes_GPRIN2_DUSP22_FANCD2.fa"
+  "main.vep_cache": "/mnt/data1/working_directory/ollie/resources/VEP_cache/homo_sapiens_vep_112_GRCh38.tar.gz",
+
+  "main.REVEL_tbi": "/mnt/data1/working_directory/ollie/resources/REVEL_cache/new_tabbed_revel_grch38.tsv.gz.tbi",
+
+  "main.REVEL_tsv": "/mnt/data1/working_directory/ollie/resources/REVEL_cache/new_tabbed_revel_grch38.tsv.gz",
+
+  "main.adapter_file": "/mnt/data1/working_directory/ollie/resources/Adapters.fa"
 }

@@ -23,55 +23,44 @@ task concat_refs {
     }
 }
 
+
 ############### MAKE SAMS ####################
 
 task generate_sam {
-
     input {
         Array[File] ref_indexed
-        Array[File] trimmed_fastq_files
+        File forward_read
+        File reverse_read
         File ref_genome_fa
     }
 
     command <<<
 
-        mkdir aligned; mkdir GRCh38
+        mkdir aligned GRCh38
 
-        # move to same dir
+        # move reference files to temp dir
         mv ~{sep=' ' ref_indexed} GRCh38
 
+        # define naming convention for SAM files
+        BASE=$(basename ~{forward_read} _R1_001.fastq.gz)
 
-        # run bwa mem (requires indexed genome)
-        ## note: only works for this fastq naming convention
+        # define output SAM file
+        OUTPUT_SAM=aligned/${BASE}.sam
 
-        # run for read 1 (R1) in every read pair
-        for R1 in ~{sep=" " trimmed_fastq_files}; do
-            
-            # Extract 5th field from basename of read 1, using '_' as the delimiter
-            CHECKREAD=$(basename $R1 | cut -d '_' -f5)
-            # check if extracted field is R1
-            if [ $CHECKREAD = "R1" ] ; then
-                # Replace '_R1_001_paired.fastq.gz' with '_R2_001_paired.fastq.gz' to get corresponding R2
-                R2=${R1/_R1_001_paired.fastq.gz/_R2_001_paired.fastq.gz} 
-                # Extract first 4 fields from basename of R1, using '_' as the delimiter
-                BASE=$(basename $R1 | cut -d'_' -f1-4)         
-                # Set output SAM file path
-                OUTPUT_SAM = aligned/${BASE}.sam
+        # run bwa mem 2 using original FASTQ paths
+        bwa-mem2 mem -R "@RG\tID:${BASE}\tSM:${BASE}\tPL:ILLUMINA" GRCh38/~{basename(ref_genome_fa)} ~{forward_read} ~{reverse_read} > $OUTPUT_SAM 
 
-                # run bwa mem 
-                bwa-mem2 mem -R "@RG\tID:${BASE}\tSM:${BASE}\tPL:ILLUMINA" GRCh38/~{basename(ref_genome_fa)} $R1 $R2 > $OUTPUT_SAM 
-            fi
-        done
     >>>
 
     output {
-        Array[File] sam_files = glob("aligned/*[!gz].sam")
+        Array[File] sam_files = glob("aligned/*.sam")
     }
 
     runtime {
         docker: "swglh/bwamem2:v2.2.1"
     }
 }
+
 
 
 ############### MAKE BAMS ####################

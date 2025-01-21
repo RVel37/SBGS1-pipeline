@@ -11,6 +11,8 @@ import "tasks/markduplicates.wdl" as markDuplicatesTask
 import "tasks/samtools_stats.wdl" as samtoolsStatsTask
 import "tasks/post-multiqc.wdl" as postmultiqcTask
 import "tasks/variant_calling.wdl" as variantCallingTask
+import "tasks/annotating.wdl" as annotationTask
+
 
 
 ### MAIN WORKFLOW ###
@@ -21,26 +23,35 @@ workflow main {
         File adapter_file   # adapters for trimming step
         String ref_genome   # reference genome directory
         File ref_genome_fa  # reference genome fasta file
+        File vep_cache      # vep cache (for offline use)
+        File REVEL_tsv      # revel files
+        File REVEL_tbi
     }
 
-    # Generate a random number for the run
+    #Generate a random number for the run 
     call randomnumTask.generate_random_number 
 
-    # Concat FASTQs into an Array[File]
+    #Concat_fastQs into forward & reverse read Arrays
     call concat_fastqsTask.concat_fastqs_task {
         input:
             fastq_dir = fastq_dir
     }
 
     # Trimming (remove adapters to improve quality)
+    scatter (i in range(length(concat_fastqs_task.forward_read))) {
     call trimmingTask.trim_fastqs_task {
         input:
-            fastq_files = concat_fastqs_task.fastq_array,
+            forward_read = concat_fastqs_task.forward_read[i],
+            reverse_read = concat_fastqs_task.reverse_read[i],
             adapter_file = adapter_file
+        }
     }
 
-    # FastQC
-    scatter (f in trim_fastqs_task.paired_trimmed_files) {
+    Array[File] trimmed_R1_dir = flatten(trim_fastqs_task.forward_trimmed) # Flatten scattered R1 & R2 trimmed fastqs into a single dir
+    Array[File] trimmed_R2_dir = flatten(trim_fastqs_task.reverse_trimmed)
+    Array[File] paired_trimmed_fastqs = flatten(trim_fastqs_task.paired_trimmed_files)
+    #FastQC 
+    scatter (f in paired_trimmed_fastqs) {
         call fastqcTask.fastqc {
             input:
                  fastq_file = f
@@ -73,16 +84,21 @@ workflow main {
         ref_genome = ref_genome
     }
 
-    # convert to SAM 
-    call alignmentTask.generate_sam {
-        input:
-            ref_indexed = concat_refs.ref_indexed,
-            trimmed_fastq_files = trim_fastqs_task.paired_trimmed_files,
-            ref_genome_fa = ref_genome_fa
+# convert to SAM 
+    scatter (i in range(length(concat_fastqs_task.forward_read))) {
+        call alignmentTask.generate_sam {
+            input:
+                ref_indexed = concat_refs.ref_indexed,
+                forward_read = trimmed_R1_dir[i],
+                reverse_read = trimmed_R2_dir[i],  # Pass the corresponding reverse read
+                ref_genome_fa = ref_genome_fa
+        } 
     }
 
-    # SAM to BAM
-    scatter (f in generate_sam.sam_files) {
+Array[File] sam_array = flatten(generate_sam.sam_files)
+
+# SAM to BAM
+    scatter (f in sam_array) {
         call alignmentTask.generate_bam {
             input:
                 sam_file = f
@@ -125,13 +141,24 @@ workflow main {
         }
     }
 
+    # Annotation (VEP)
+    scatter (vcf in vcf_files) {
+        call annotationTask.VEP_annotation {
+            input: 
+                vcf = vcf,
+                vep_cache = vep_cache,
+                REVEL_tbi = REVEL_tbi,
+                REVEL_tsv = REVEL_tsv
 
-### OUTPUTS ###
+        }
+    }
+
     output {
         File multiqc_report = multiqc.multiqc_report
         File multiqc_data = multiqc.multiqc_data
         File postprocessing_multiqc_report = multiqc_postprocessing.postprocessing_multiqc_report
         File postprocessing_multiqc_data = multiqc_postprocessing.postprocessing_multiqc_data
         Array[File] vcf_files = octopus_caller.vcf_file
+        Array[File] annotated_vcfs = VEP_annotation.annotation_output
     }
 }
